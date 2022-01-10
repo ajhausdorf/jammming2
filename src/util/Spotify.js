@@ -22,31 +22,27 @@ export const Spotify = {
             window.location = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&scope=playlist-modify-public&redirect_uri=${REDIRECT_URI}`;
         }
     },
-    search(term) {
+    async search(term) {
         const accessToken = Spotify.getAccessToken();
         const url = 'https://api.spotify.com/v1/search?type=track&q=' + term;
-        return fetch(url, {
-            headers: {Authorization: `Bearer ${accessToken}`}
-        }).then(response => {
+        try {
+            const response = await fetch(url, { headers: {Authorization: `Bearer ${accessToken}`} });
             if(response.ok) {
-                let jsonResponse = response.json();
-                return jsonResponse;
-            }
-            throw new Error('request failed!');
-        }, (networkError => console.log(networkError.message)))
-        .then(jsonResponse => {
-            if(!jsonResponse.tracks) {
-                return [];
-            }
-            let tracks = jsonResponse.tracks.items.map(track => ({
+                const jsonResponse = await response.json();
+                if(!jsonResponse.tracks) {
+                    return [];
+                }
+                return jsonResponse.tracks.items.map(track => ({
                     id: track.id,
                     name: track.name,
                     artist: track.artists[0].name,
                     album: track.album.name,
                     uri: track.uri
-            }));
-            return tracks
-        });
+                }));
+            }
+        } catch(error) {
+            console.log(error);
+        }
     },
     savePlaylist(playlistName, trackURIs) {
         if (!playlistName || !trackURIs) {
