@@ -15,7 +15,7 @@ export class SearchResults extends React.Component {
         } else {
             return(    
                 <div className="SearchResults">
-                    <h3>Search to populate the list!</h3>
+                    <h2 className="preResult">Search to populate the list!</h2>
                 </div>
             )
         }
